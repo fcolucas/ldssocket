@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #define PORTA 2000
-#define TAM 4096
+#define TAM 300
 
 struct sockaddr_in remoto;
 
@@ -17,12 +17,10 @@ int main()
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     socklen_t len = sizeof(remoto);
-    int slen;
-    char buffer[TAM];
+    int slen, rec, env;
+    char mensagem[TAM], resposta[TAM];
     char ip[32];
     strcpy(ip, "127.0.0.1");
-
- 	printf("Sou o cliente!\n");
 
     if(sockfd == -1){
         perror("socket ");
@@ -41,17 +39,24 @@ int main()
         exit(1);
     }
 
-        while(1){
-            if((slen = recv(sockfd, buffer, TAM, 0))>0){
-                buffer[slen-1] = '\0';
-                printf("Mensagem Recebida: %s\n", buffer);
-            }
-			memset(buffer, 0x0, TAM);
-			fgets(buffer, TAM, stdin);
-			send(sockfd, buffer, TAM, 0);
-        }
+    printf("Conectado!\n\n");
+
+    do{
+        //printf("Cliente: ");
+        fgets(mensagem, 256, stdin);
+        mensagem[strlen(mensagem)-1] = '\0';
+        env = send(sockfd, mensagem, strlen(mensagem), 0);
+
+        //if(resposta[0]=='*') rec = -1;
+        //if(mensagem[0]=='*') env = -1;
+
+        rec = recv(sockfd, resposta, 256, 0);
+        resposta[rec] = '\0';
+        printf("Servidor: %s\n", resposta);
+    }while(rec != -1 && env != -1);
 
     close(sockfd);
     printf("Cliente Encerrado! \n");
     return 0;
 }
+
