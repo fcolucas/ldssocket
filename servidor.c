@@ -29,8 +29,10 @@ void setting_socket(struct sockaddr_in *local, int family, int port){
     local->sin_port = htons(port);
     memset(local->sin_zero, 0x0, 8);
 }
-
+/*
 int connect_socket(int sockfd, struct sockaddr_in local, struct sockaddr_in remoto){
+    socklen_t len;
+    int client;
     int on = bind(sockfd, (struct sockaddr *)&local, sizeof(local));
     if(on == -1){
         perror("bind ");
@@ -44,8 +46,8 @@ int connect_socket(int sockfd, struct sockaddr_in local, struct sockaddr_in remo
     }
     printf("Aguardando cliente...\n");
 
-    socklen_t len = sizeof(remoto);;
-    int client = accept(sockfd, (struct sockaddr *)&remoto, &len);
+    len = sizeof(remoto);
+    client = accept(sockfd, (struct sockaddr *)&remoto, &len);
     if(client==-1){
         perror("accept ");
         exit(1);
@@ -53,7 +55,7 @@ int connect_socket(int sockfd, struct sockaddr_in local, struct sockaddr_in remo
     return client;
 	printf("Cliente conectado!\n\n");
 }
-
+*/
 int main()
 {
     int client, rec, env;
@@ -68,9 +70,8 @@ int main()
     local.sin_addr.s_addr = inet_addr("192.168.254.1");
     memset(local.sin_zero, 0x0, 8);
 */
-    client = connect_socket(sockfd, local, remoto);
+    /*client = connect_socket(sockfd, local, remoto);*/
 
-/*
     if (bind(sockfd, (struct sockaddr *)&local, sizeof(local))==-1){
         perror("bind ");
         exit(1);
@@ -83,17 +84,17 @@ int main()
 
 	printf("Aguardando cliente...\n");
 
+    socklen_t len = sizeof(remoto);
     client = accept(sockfd, (struct sockaddr *)&remoto, &len);
     if(client==-1){
         perror("accept ");
         exit(1);
     }
 	printf("Cliente conectado!\n\n");
-*/
 
     do{
-        rec = recv(client, resposta, 256, 0);
-        resposta[rec] = '\0';
+        rec = recv(client, resposta, strlen(resposta), 0);
+        resposta[rec-1] = '\0';
         printf("Cliente: %s\n", resposta);
 
         /*printf("Servidor: ");*/
