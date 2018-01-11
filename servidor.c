@@ -9,6 +9,8 @@
 
 #define PORTA 2000
 #define TAM 256
+#define TRUE 1
+#define FALSE 0
 
 struct sockaddr_in local;
 struct sockaddr_in remoto;
@@ -17,7 +19,8 @@ int main()
 {
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     socklen_t len = sizeof(remoto);
-    int client, rec, env;
+    int client, rec;
+    int sair = FALSE;
     char mensagem[TAM], resposta[TAM];
 
     if(sockfd == -1){
@@ -50,24 +53,46 @@ int main()
         exit(1);
     }
 	printf("Cliente conectado!\n\n");
+	printf("Ponha * para mandar uma mensagem. Escreva # para terminar a conexao\n");
+	strcpy(mensagem, "Servidor conectado\n");
+	send(client, mensagem, strlen(mensagem), 0);
 
     do{
-        rec = recv(client, resposta, 256, 0);
+        rec = recv(client, resposta, TAM, 0);
         resposta[rec] = '\0';
         printf("Cliente: %s\n", resposta);
+        if(*resposta == '#'){
+            *resposta = '*';
+            sair = TRUE;
+        }
+    }while(*resposta != '*');
 
-        //printf("Servidor: ");
-        fgets(mensagem, 256, stdin);
-        mensagem[strlen(mensagem)-1] = '\0';
-        env = send(client, mensagem, strlen(mensagem), 0);
+    do{
+        printf("Escreva sua mensagem: ");
+        do{
+            fgets(mensagem, TAM, stdin);
+            mensagem[strlen(mensagem)-1] = '\0';
+            send(client, mensagem, strlen(mensagem), 0);
+            if(*mensagem == '#'){
+                send(client, mensagem, strlen(mensagem), 0);
+                *mensagem = '*';
+                sair = TRUE;
+            }
+        }while(*mensagem != '*');
 
-        //if(resposta[0]=='*') rec = -1;
-        //if(mensagem[0]=='*') env = -1;
-	}while(rec != -1 && env != -1);
+        do{
+            rec = recv(client, resposta, TAM, 0);
+            resposta[rec] = '\0';
+            printf("Cliente: %s\n", resposta);
+            if(*resposta == '#'){
+                *resposta = '*';
+                sair = TRUE;
+            }
+        }while(*resposta != '*');
+	}while(!sair);
 
 	close(client);
     close(sockfd);
     printf("Servidor Encerrado! \n");
     return 0;
 }
-
