@@ -52,6 +52,7 @@ int main()
         perror("accept ");
         exit(1);
     }
+	
 	printf("Cliente conectado!\n\n");
 	printf("Ponha * para mandar uma mensagem. Escreva # para terminar a conexao\n");
 	strcpy(mensagem, "Servidor conectado\n");
