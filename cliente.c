@@ -22,7 +22,8 @@ int main()
     int slen, rec, sair = FALSE;
     char mensagem[TAM], resposta[TAM];
     char ip[32];
-    strcpy(ip, "127.0.0.1");
+    char myIP[] = "127.0.0.1"
+    strcpy(ip, myIP);
 
     if(sockfd == -1){
         perror("socket ");
